@@ -209,9 +209,29 @@ const move = (field, dir, currIndex) => {
 
 const main = () => {
     let myField;
+    let valid = false;
+    let numOfRows;
+    let numOfColumns
 
     do {
-        myField = new Field(Field.generateField(30,35));
+        term.cyan("Determine dimensions\n");
+        console.log();
+        numOfRows = prompt("Number of rows: ");
+        numOfColumns = prompt("Number of columns: ");
+
+        if ((numOfRows < 2 && numOfColumns < 2) || numOfRows < 2 || numOfColumns < 2)
+            term.red("\nDimensions too small, please try again\n");
+
+        else if ((numOfRows > 50 && numOfColumns > 50) || numOfRows > 50 || numOfColumns > 50)
+            term.red("\nDimensions too large, please try again\n");
+
+        else
+            valid = true;
+
+    } while (!valid);
+
+    do {
+        myField = new Field(Field.generateField(numOfRows,numOfColumns));
     } while (!validateField(myField.field));
 
     let quit = false;
