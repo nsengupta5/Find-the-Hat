@@ -6,6 +6,7 @@ const fieldCharacter = '░';
 const pathCharacter = '*';
 
 class Field {
+    
     constructor(field) {
         this.field = field;
     }
@@ -42,28 +43,26 @@ class Field {
 
         myField[0][0] = pathCharacter;
 
-        let hatXIndex = 0;
-        let hatYIndex = 0; 
+        let hatColumn = 0;
+        let hatRow = 0; 
 
-        while (hatXIndex === 0 && hatYIndex === 0) {
-            hatYIndex = Math.floor(Math.random() * height);
-            hatXIndex = Math.floor(Math.random() * width);
+        while (hatColumn === 0 && hatRow === 0) {
+            hatRow = Math.floor(Math.random() * height);
+            hatColumn = Math.floor(Math.random() * width);
         }
     
-        myField[hatYIndex][hatXIndex] = hat;
+        myField[hatRow][hatColumn] = hat;
 
-        let i = 0;
-        while (i < numOfHoles) {
-            let xCoord = 0;
-            let yCoord = 0;
+        for (let i = 0; i < numOfHoles; i++) {
+            let holeColumn = 0;
+            let holeRow = 0;
 
-            while ((xCoord === 0 && yCoord === 0) || myField[yCoord][xCoord] === hat) {
-                xCoord = Math.floor(Math.random() * width);
-                yCoord = Math.floor(Math.random() * height);
+            while ((holeColumn === 0 && holeRow === 0) || myField[holeRow][holeColumn] === hat) {
+                holeColumn = Math.floor(Math.random() * width);
+                holeRow = Math.floor(Math.random() * height);
             }
 
-            myField[yCoord][xCoord] = hole;
-            i++;
+            myField[holeRow][holeColumn] = hole;
         }
 
         return myField;
@@ -133,7 +132,7 @@ const move = (field, dir, currIndex) => {
 }
 
 const main = () => {
-    const myField = new Field(Field.generateField(10,10));
+    const myField = new Field(Field.generateField(20,25));
     let quit = false;
     let currIndex = [0,0];
 
