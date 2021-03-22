@@ -1,9 +1,18 @@
 const prompt = require('prompt-sync')({sigint: true});
+const term = require( 'terminal-kit' ).terminal;
 
 const hat = '^';
 const hole = 'O';
 const fieldCharacter = '░';
 const pathCharacter = '*';
+
+let booleanField = [];
+let visited = [];
+let correctPath = [];
+let startRow = 0;
+let endRow = 0;
+let startColumn = 0;
+let endColumn = 0;
 
 class Field {
     
@@ -50,7 +59,10 @@ class Field {
             hatRow = Math.floor(Math.random() * height);
             hatColumn = Math.floor(Math.random() * width);
         }
-    
+
+        endColumn = hatColumn;
+        endRow = hatRow; 
+        
         myField[hatRow][hatColumn] = hat;
 
         for (let i = 0; i < numOfHoles; i++) {
@@ -78,12 +90,12 @@ const checkMove = (field, row, column) => {
 
         if (field[row][column] === hat) {
             field[row][column] = pathCharacter;
-            console.log("Congratulations, you won!");
+            term.green("Congratulations, you won!");
             return true;
         }
 
         else if (field[row][column] === hole) {
-            console.log("Oh no! You fell into the hole!");
+            term.red("Oh no! You fell into the hole!");
             return true;
         }
 
@@ -92,8 +104,72 @@ const checkMove = (field, row, column) => {
             return false;
         }
     } catch (e) {
-        console.log("Out of bounds!\n");
+        term.red("Out of bounds!\n");
     }
+}
+
+const solver = (currRow, currColumn) => {
+
+    if (currColumn === endColumn && currRow == endRow) {
+        return true;
+    }
+    
+    if (visited[currRow][currColumn] || booleanField[currRow][currColumn])
+        return false;
+
+    visited[currRow][currColumn] = true;
+
+    if (currRow != 0) {
+        if (solver(currRow - 1, currColumn)) {
+            correctPath[currRow][currColumn] = true;
+            return true;
+        }
+    }
+
+    if (currRow != visited.length - 1) {
+        if (solver(currRow + 1, currColumn)) {
+            correctPath[currRow][currColumn] = true;
+            return true;
+        }
+    }
+
+    if (currColumn != 0) {
+        if (solver(currRow, currColumn - 1)) {
+            correctPath[currRow][currColumn] = true;
+            return true;
+        }
+    }
+
+    if (currColumn != visited[0].length - 1) {
+        if (solver(currRow, currColumn + 1)) {
+            correctPath[currRow][currColumn] = true;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+const validateField = field => {
+    for (let i = 0; i < field.length; i++) {
+        for (let j = 0; j < field[0].length; j++) {
+            if (!visited[i]) {
+                visited[i] = [];
+                booleanField[i] = [];
+            }
+
+            if (!visited[i][j]) {
+                visited[i][j] = false;
+                if (field[i][j] === hole) 
+                    booleanField[i][j] = true;
+                else
+                    booleanField[i][j] = false;
+            }
+        }
+    }
+
+    correctPath = [...visited];
+    return solver(startRow, startColumn);
 }
 
 const move = (field, dir, currIndex) => {
@@ -127,12 +203,17 @@ const move = (field, dir, currIndex) => {
                 throw Error();
         }
     } catch(e) {
-        console.log("Invalid direction!\n");
+        term.red("Invalid direction!\n");
     }
 }
 
 const main = () => {
-    const myField = new Field(Field.generateField(20,25));
+    let myField;
+
+    do {
+        myField = new Field(Field.generateField(30,35));
+    } while (!validateField(myField.field));
+
     let quit = false;
     let currIndex = [0,0];
 
