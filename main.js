@@ -70,81 +70,79 @@ class Field {
     }
 }
 
-const checkMove = (field, targetXCoord, targetYCoord) => {
+const checkMove = (field, row, column) => {
     try {
-        let target = field[targetYCoord][targetXCoord];
+        let target = field[row][column];
         if (typeof target === 'undefined') {
             throw Error();
         }
 
-        if (field[targetYCoord][targetXCoord] === hat) {
-            field[targetYCoord][targetXCoord] = pathCharacter;
+        if (field[row][column] === hat) {
+            field[row][column] = pathCharacter;
             console.log("Congratulations, you won!");
             return true;
         }
 
-        else if (field[targetYCoord][targetXCoord] === hole) {
+        else if (field[row][column] === hole) {
             console.log("Oh no! You fell into the hole!");
             return true;
         }
 
         else {
-            field[targetYCoord][targetXCoord] = pathCharacter;
+            field[row][column] = pathCharacter;
             return false;
         }
     } catch (e) {
-        console.log("Out of bounds\n");
+        console.log("Out of bounds!\n");
     }
 }
 
 const move = (field, dir, currIndex) => {
     let checked = false;
-    let curr = '';
+    let row = currIndex[0];
+    let column = currIndex[1];
 
     try {
         switch (dir.toLowerCase()) {
             case "l":
-                checked = checkMove(field, currIndex[1] - 1, currIndex[0]);
-                curr = field[currIndex[0]][currIndex[1] - 1];
-                if (curr)
-                    currIndex[1] = currIndex[1] - 1;
+                checked = checkMove(field, row, column - 1);
+                if (field[row][column - 1])
+                    currIndex[1] = column - 1;
                 return checked;
             case "r":
-                checked = checkMove(field, currIndex[1] + 1, currIndex[0]);
-                curr = field[currIndex[0]][currIndex[1] + 1];
-                if (curr)
-                    currIndex[1] = currIndex[1] + 1;
+                checked = checkMove(field, row, column + 1);
+                if (field[row][column + 1])
+                    currIndex[1] = column + 1;
                 return checked;
             case "u":
-                checked = checkMove(field, currIndex[1], currIndex[0] - 1);
-                curr = field[currIndex[0] - 1][currIndex[1]];
-                if (curr)
-                    currIndex[0] = currIndex[0] - 1;
+                checked = checkMove(field, row - 1, column);
+                if (field[row - 1][column])
+                    currIndex[0] = row - 1;
                 return checked;
             case "d":
-                checked =  checkMove(field, currIndex[1], currIndex[0] + 1);
-                curr = field[currIndex[0] + 1][currIndex[1]];
-                if (curr) 
-                    currIndex[0] = currIndex[0] + 1;
+                checked =  checkMove(field, row + 1, column);
+                if (field[row + 1][column]) 
+                    currIndex[0] = row + 1;
                 return checked;
             default:
-                throw Error("Invalid direction");
+                throw Error();
         }
     } catch(e) {
-        
+        console.log("Invalid direction!\n");
     }
 }
 
 const main = () => {
-    const myField = new Field(Field.generateField(8,9));
-    let hatFound = false;
+    const myField = new Field(Field.generateField(10,10));
+    let quit = false;
     let currIndex = [0,0];
 
     console.log(myField.print());
-    while (!hatFound) {
+    while (!quit) {
         let movement = prompt("Which way? ");
-        hatFound = move(myField.field, movement, currIndex);
-        console.log(myField.print());
+        quit = move(myField.field, movement, currIndex);
+        if (!quit)
+            console.log(myField.print());
     }
 }
 
